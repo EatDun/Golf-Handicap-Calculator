@@ -159,14 +159,14 @@ public class Main {
                     scores.add(newScore);
                     
                 	try {
-                	    mapper.writeValue(coursesFile, courses); // Save to file
+                	    mapper.writeValue(coursesFile, courses);
                 	    System.out.println("Course saved to Courses.json");
                 	} catch (IOException e) {
                 	    System.out.println("Error writing to courses file: " + e.getMessage());
                 	}
                 	
                 	try {
-                	    mapper.writeValue(scoresFile, scores); // Save to file
+                	    mapper.writeValue(scoresFile, scores);
                 	    System.out.println("Score saved to Scores.json");
                 	} catch (IOException e) {
                 	    System.out.println("Error writing to scores file: " + e.getMessage());
@@ -192,7 +192,7 @@ public class Main {
                     scores.add(newScore);
                     
                     try {
-                	    mapper.writeValue(scoresFile, scores); // Save to file
+                	    mapper.writeValue(scoresFile, scores);
                 	    scores.add(newScore);
                 	    System.out.println("Score saved to Scores.json");
                 	} catch (IOException e) {
@@ -383,7 +383,7 @@ public class Main {
 
             		if (course == null) {
             		    System.out.println("Course with ID " + scores.get(i).courseID + " not found.");
-            		    continue; // or handle appropriately
+            		    continue; 
             		}
             		
             		double r = course.rating;
@@ -418,14 +418,6 @@ public class Main {
             	
             	double av8 = avCalc(take, top8Differentials);
             	double handicap = av8 * .96;
-            	
-            	System.out.println(rawDifferentials18);
-            	System.out.println(rawDifferentials9);
-            	System.out.println(Arrays.toString(combinedDifferentials9));
-            	System.out.println(Arrays.toString(rawDifferentials));
-            	System.out.println(Arrays.toString(sortedDifferentials));
-            	System.out.println(Arrays.toString(top8Differentials));
-            	System.out.println(av8);
             	
             	System.out.println(handicap);
                 
