@@ -3,7 +3,7 @@ package handicapApp;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.core.type.TypeReference;
-
+import java.util.Arrays;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -45,6 +45,34 @@ public class Main {
         
         return preAv / k;
     }
+	
+	public static double difCalc (int i, double r, double s, int h, int x) {
+		return (x - r ) * 113 / s;
+	}
+	
+	public static double[] oneTwoAdder (List<Double> list) {
+		int l = list.size() / 2 ;
+		double[] f = new double[l];
+		for (int i = 0; i < list.size() - 1; i += 2) {
+		    double sum = list.get(i) + list.get(i + 1);
+		    f[i / 2] = sum;
+		}
+		return f;
+	}
+	
+	public static double[] arrayJoin(double[] one, List<Double> two) {
+		double combined[] = new double[one.length + two.size()];
+		
+		for (int i = 0; i < one.length; i++) {
+		    combined[i] = one[i];
+		}
+		
+		for (int i = 0; i < two.size(); i++) {
+		    combined[one.length + i] = two.get(i);
+		}
+		
+		return combined;
+	}
 	
     public static void main(String[] args) {
         Scanner input = new Scanner(System.in);
@@ -99,6 +127,21 @@ public class Main {
                 	System.out.println("Enter course par:");
                 	int par = input.nextInt();
                 	
+                	System.out.println("Press f for 18 holes or h for 9 holes");
+                	String holeInput = input.nextLine();
+                	input.nextLine();
+                	int holes;
+                	if(holeInput.equalsIgnoreCase("f")) {
+                		holes = 18;
+                	}
+                	else if(holeInput.equalsIgnoreCase("h")) {
+                		holes = 9;
+                	}
+                	else {
+                		holes = 0;
+                		System.out.println("Invalid selection. Defaulted holes to zero. Please fix in course editor!");
+                	}
+                	
                 	System.out.println("Enter course rating:");
                 	double rating = input.nextDouble();
                 	
@@ -109,7 +152,7 @@ public class Main {
                 	int courseID = courses.size() + 1;
                 	int roundNum = scores.size() + 1;
                 	
-                	Course newCourse = new Course(name, tees, par, rating, slope, courseID); 
+                	Course newCourse = new Course(name, tees, par, holes, rating, slope, courseID); 
                 	courses.add(newCourse);
                 	
                 	Score newScore = new Score(shots, roundNum, courseID);
@@ -167,6 +210,21 @@ public class Main {
             	System.out.println("Enter couse par:");
             	int par = input.nextInt();
             	
+            	System.out.println("Press f for 18 holes or h for 9 holes");
+            	String holeInput = input.nextLine();
+            	input.nextLine();
+            	int holes;
+            	if(holeInput.equalsIgnoreCase("f")) {
+            		holes = 18;
+            	}
+            	else if(holeInput.equalsIgnoreCase("h")) {
+            		holes = 9;
+            	}
+            	else {
+            		holes = 0;
+            		System.out.println("Invalid selection. Defaulted holes to zero. Please fix in course editor!");
+            	}
+            	
             	System.out.println("Enter course rating:");
             	double rating = input.nextDouble();
             	
@@ -184,7 +242,7 @@ public class Main {
             	
             	int courseID = courses.size() + 1;
             	
-            	Course newCourse = new Course(name, tees, par, rating, slope, courseID); 
+            	Course newCourse = new Course(name, tees, par, holes, rating, slope, courseID); 
             	courses.add(newCourse);
             	
             	try {
@@ -246,7 +304,7 @@ public class Main {
                 }
                 
                 input.nextLine();
-                System.out.println("Press n to edit name:\nPress p to edit par:\nPress r to edit rating:\nPress s to edit slope:");
+                System.out.println("Press n to edit name:\nPress p to edit par:\nPress h to edit holes:\nPress r to edit rating:\nPress s to edit slope:");
                 String editInput = input.nextLine();
                 
                 switch (editInput) {
@@ -257,6 +315,20 @@ public class Main {
                 	case "p":
                 		System.out.println("Enter new par:");
                 		courseToEdit.par = input.nextInt();
+                		break;
+                	case "h":
+                		System.out.println("Press f for 18 holes or h for 9 holes");
+                    	String holeInput2 = input.nextLine();
+                    	if(holeInput2.equalsIgnoreCase("f")) {
+                    		courseToEdit.holes = 18;
+                    	}
+                    	else if(holeInput2.equalsIgnoreCase("h")) {
+                    		courseToEdit.holes = 9;
+                    	}
+                    	else {
+                    		courseToEdit.holes = 0;
+                    		System.out.println("Invalid selection. Defaulted holes to zero. Please fix in course editor!");
+                    	}
                 		break;
                 	case "r":
                 		System.out.println("Enter new rating:");
@@ -296,9 +368,11 @@ public class Main {
                     System.out.println("Error reading courses file: " + e.getMessage());
                 }
             	
-            	int limit = Math.min(scores.size(), 20);
-            	double[] rawDifferentials = new double[limit];
-            	for (int i = 0; i < limit; i++) {
+            	int index18 = 0;
+            	int index9 = 0;
+            	List<Double> rawDifferentials18 = new ArrayList<>();
+            	List<Double> rawDifferentials9 = new ArrayList<>();
+            	for (int i = 0; i < 20 ; i++) {
             		Course course = null;
             		for (Course c : courses) {
             		    if (c.courseID == scores.get(i).courseID) {
@@ -314,8 +388,23 @@ public class Main {
             		
             		double r = course.rating;
             		double s = course.slope;
-            	    rawDifferentials[i] = (scores.get(i).shots - r ) * 113 / s;
+            		int h = course.holes;
+            		
+            		if(h == 18) {
+            			rawDifferentials18.add(difCalc(i, r, s, h, scores.get(i).shots));
+            		}
+            		else if (h == 9 ){
+            			rawDifferentials9.add(difCalc(i, r, s, h, scores.get(i).shots));
+            		}
+            		else {
+            			System.out.println("Hole count not detected");
+            			System.out.println(course.courseID);
+            		}
             	}
+            	
+            	double[] combinedDifferentials9 = oneTwoAdder(rawDifferentials9);
+            	
+            	double[] rawDifferentials = arrayJoin(combinedDifferentials9, rawDifferentials18);
             	
             	double sortedDifferentials[] = arraySort(rawDifferentials);
             	
@@ -329,6 +418,14 @@ public class Main {
             	
             	double av8 = avCalc(take, top8Differentials);
             	double handicap = av8 * .96;
+            	
+            	System.out.println(rawDifferentials18);
+            	System.out.println(rawDifferentials9);
+            	System.out.println(Arrays.toString(combinedDifferentials9));
+            	System.out.println(Arrays.toString(rawDifferentials));
+            	System.out.println(Arrays.toString(sortedDifferentials));
+            	System.out.println(Arrays.toString(top8Differentials));
+            	System.out.println(av8);
             	
             	System.out.println(handicap);
                 
